@@ -40,9 +40,30 @@ namespace API_REST_TP2.Controllers.Tests
         }
 
         [TestMethod()]
+        public void GetSeriesTestFail()
+        {
+            SeriesDBContext contextFail = new SeriesDBContext(new DbContextOptionsBuilder<SeriesDBContext>().UseNpgsql("Server=localhost; port=5432; Database=SeriesDB; uid=postgres; password=postgres;").Options);
+            contextFail.Series = null;
+            SeriesController controllerFail = new SeriesController(contextFail);
+            
+        }
+
+        [TestMethod()]
         public void GetSerieTest()
         {
-            Assert.Fail();
+            SeriesController controller = new SeriesController(_context);
+            Serie importSerie = controller.GetSerie(3).Result.Value;
+            Serie testSample = new Serie
+            {
+                Serieid = 3,
+                Titre = "True Blood",
+                Resume = "Ayant trouvé un substitut pour se nourrir sans tuer (du sang synthétique), les vampires vivent désormais parmi les humains. Sookie, une serveuse capable de lire dans les esprits, tombe sous le charme de Bill, un mystérieux vampire. Une rencontre qui bouleverse la vie de la jeune femme...",
+                Nbsaisons = 7,
+                Nbepisodes = 81,
+                Anneecreation = 2008,
+                Network = "HBO"
+            };
+            Assert.AreEqual(testSample, importSerie);
         }
 
         [TestMethod()]
