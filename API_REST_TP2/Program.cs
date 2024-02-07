@@ -1,3 +1,6 @@
+using API_REST_TP2.Models.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+
 namespace API_REST_TP2
 {
     public class Program
@@ -12,6 +15,8 @@ namespace API_REST_TP2
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<SeriesDBContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("SerieDBContext")));
 
             var app = builder.Build();
 
