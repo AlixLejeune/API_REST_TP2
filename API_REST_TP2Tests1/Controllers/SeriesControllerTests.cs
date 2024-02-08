@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using API_REST_TP2.Models.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace API_REST_TP2.Controllers.Tests
@@ -40,15 +41,6 @@ namespace API_REST_TP2.Controllers.Tests
         }
 
         [TestMethod()]
-        public void GetSeriesTestFail()
-        {
-            SeriesDBContext contextFail = new SeriesDBContext(new DbContextOptionsBuilder<SeriesDBContext>().UseNpgsql("Server=localhost; port=5432; Database=SeriesDB; uid=postgres; password=postgres;").Options);
-            contextFail.Series = null;
-            SeriesController controllerFail = new SeriesController(contextFail);
-            
-        }
-
-        [TestMethod()]
         public void GetSerieTest()
         {
             SeriesController controller = new SeriesController(_context);
@@ -67,6 +59,14 @@ namespace API_REST_TP2.Controllers.Tests
         }
 
         [TestMethod()]
+        public void GetSerieFailTest()
+        {
+            SeriesController controller = new SeriesController(_context);
+            Serie importSerie = controller.GetSerie(-1).Result.Value;
+            Assert.IsNull(importSerie);
+        }
+
+        [TestMethod()]
         public void PutSerieTest()
         {
             Assert.Fail();
@@ -81,7 +81,23 @@ namespace API_REST_TP2.Controllers.Tests
         [TestMethod()]
         public void DeleteSerieTest()
         {
-            Assert.Fail();
+            SeriesController controller = new SeriesController(_context);
+            IActionResult res = controller.DeleteSerie(1).Result;
+            Assert.IsInstanceOfType(res, typeof(NoContentResult));
+            IActionResult resfail = controller.DeleteSerie(1).Result;
+            Assert.IsInstanceOfType(resfail, typeof(NotFoundResult));
+
+            controller.PostSerie(new Serie
+            {
+                Serieid = 1,
+                Titre = "Scrubs",
+                Resume = "J.D. est un jeune médecin qui débute sa carrière dans l'hôpital du Sacré-Coeur. Il vit avec son meilleur ami Turk, qui lui est chirurgien dans le même hôpital. Très vite, Turk tombe amoureux d'une infirmière Carla. Elliot entre dans la bande. C'est une étudiante en médecine quelque peu surprenante. Le service de médecine est dirigé par l'excentrique Docteur Cox alors que l'hôpital est géré par le diabolique Docteur Kelso. A cela viennent s'ajouter plein de personnages hors du commun : Todd le chirurgien obsédé, Ted l'avocat dépressif, le concierge qui trouve toujours un moyen d'embêter JD... Une belle galerie de personnage !"
+            ,
+                Nbsaisons = 9,
+                Nbepisodes = 184,
+                Anneecreation = 2001,
+                Network = "ABC (US)"
+            });
         }
     }
 }
